@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Time Calculator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+            max-width: 600px;
+            width: 100%;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            font-weight: 300;
+        }
+
+        .time-entries {
+            margin-bottom: 30px;
+        }
+
+        .time-entry {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .time-entry:hover {
+            border-color: #667eea;
+            background: #f0f2ff;
+        }
+
+        .time-inputs {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            flex: 1;
+        }
+
+        .time-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .time-group label {
+            font-size: 0.9em;
+            color: #666;
+            font-weight: 500;
+        }
+
+        .time-input {
+            padding: 10px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 1.1em;
+            width: 100px;
+            text-align: center;
+            transition: border-color 0.3s ease;
+        }
+
+        .time-input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .remove-btn {
+            background: #ff4757;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 35px;
+            height: 35px;
+            font-size: 1.2em;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .remove-btn:hover {
+            background: #ff3742;
+            transform: scale(1.1);
+        }
+
+        .add-btn {
+            background: #2ed573;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            padding: 12px 20px;
+            font-size: 1.1em;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin: 0 auto;
+            transition: all 0.3s ease;
+        }
+
+        .add-btn:hover {
+            background: #26d0ce;
+            transform: translateY(-2px);
+        }
+
+        .calculate-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 15px;
+            padding: 15px 30px;
+            font-size: 1.2em;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .calculate-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .result {
+            margin-top: 30px;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 15px;
+            text-align: center;
+            display: none;
+        }
+
+        .result.show {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .result h3 {
+            margin-bottom: 10px;
+            font-size: 1.3em;
+        }
+
+        .result .total-hours {
+            font-size: 2.5em;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+
+        .result .breakdown {
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+
+        .entry-number {
+            background: #667eea;
+            color: white;
+            border-radius: 50%;
+            width: 25px;
+            height: 25px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8em;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>⏰ Time Calculator</h1>
+        
+        <div class="time-entries" id="timeEntries">
+            <!-- Time entries will be added here -->
+        </div>
+        
+        <button class="add-btn" onclick="addTimeEntry()">
+            <span>+</span> Add Time Entry
+        </button>
+        
+        <button class="calculate-btn" onclick="calculateTotal()">
+            Calculate Total Hours
+        </button>
+        
+        <div class="result" id="result">
+            <h3>Total Time</h3>
+            <div class="total-hours" id="totalHours">0.00</div>
+            <div class="breakdown" id="breakdown"></div>
+        </div>
+    </div>
+
+    <script>
+        let entryCount = 0;
+
+        function addTimeEntry() {
+            entryCount++;
+            const timeEntries = document.getElementById('timeEntries');
+            
+            const entryDiv = document.createElement('div');
+            entryDiv.className = 'time-entry';
+            entryDiv.innerHTML = `
+                <div class="entry-number">${entryCount}</div>
+                <div class="time-inputs">
+                    <div class="time-group">
+                        <label>Time 1</label>
+                        <input type="text" class="time-input" id="time1_${entryCount}" placeholder="00:00" pattern="[0-9]{1,2}:[0-9]{2}">
+                    </div>
+                    <div class="time-group">
+                        <label>Time 2</label>
+                        <input type="text" class="time-input" id="time2_${entryCount}" placeholder="00:00" pattern="[0-9]{1,2}:[0-9]{2}">
+                    </div>
+                </div>
+                <button class="remove-btn" onclick="removeTimeEntry(this)">×</button>
+            `;
+            
+            timeEntries.appendChild(entryDiv);
+        }
+
+        function removeTimeEntry(button) {
+            const entry = button.parentElement;
+            entry.remove();
+            updateEntryNumbers();
+        }
+
+        function updateEntryNumbers() {
+            const entries = document.querySelectorAll('.time-entry');
+            entries.forEach((entry, index) => {
+                const numberDiv = entry.querySelector('.entry-number');
+                numberDiv.textContent = index + 1;
+            });
+            entryCount = entries.length;
+        }
+
+        function parseTime(timeString) {
+            if (!timeString || !timeString.includes(':')) return { hours: 0, minutes: 0 };
+            
+            const parts = timeString.split(':');
+            const hours = parseInt(parts[0]) || 0;
+            const minutes = parseInt(parts[1]) || 0;
+            
+            return { hours, minutes };
+        }
+
+        function calculateTotal() {
+            const entries = document.querySelectorAll('.time-entry');
+            let totalHours = 0;
+            let totalMinutes = 0;
+            let breakdown = [];
+
+            entries.forEach((entry, index) => {
+                const time1Str = entry.querySelector(`#time1_${index + 1}`).value;
+                const time2Str = entry.querySelector(`#time2_${index + 1}`).value;
+
+                const time1 = parseTime(time1Str);
+                const time2 = parseTime(time2Str);
+
+                // Add the two times together
+                let entryHours = time1.hours + time2.hours;
+                let entryMinutes = time1.minutes + time2.minutes;
+
+                // Convert excess minutes to hours
+                if (entryMinutes >= 60) {
+                    entryHours += Math.floor(entryMinutes / 60);
+                    entryMinutes = entryMinutes % 60;
+                }
+
+                totalHours += entryHours;
+                totalMinutes += entryMinutes;
+
+                // Add to breakdown
+                const entryTime = entryHours + (entryMinutes / 60);
+                breakdown.push(`Entry ${index + 1}: ${entryTime.toFixed(3)} hours`);
+            });
+
+            // Convert excess minutes to hours
+            const additionalHours = Math.floor(totalMinutes / 60);
+            totalHours += additionalHours;
+            const remainingMinutes = totalMinutes % 60;
+
+            // Calculate final total with decimal
+            const finalTotal = totalHours + (remainingMinutes / 60);
+
+            // Display result
+            document.getElementById('totalHours').textContent = finalTotal.toFixed(3);
+            document.getElementById('breakdown').innerHTML = breakdown.join('<br>');
+            document.getElementById('result').classList.add('show');
+        }
+
+        // Add initial time entry on page load
+        window.onload = function() {
+            addTimeEntry();
+        };
+    </script>
+</body>
+</html> 
