@@ -78,6 +78,11 @@
             font-weight: 500;
         }
 
+        .time-input-container {
+            position: relative;
+            display: inline-block;
+        }
+
         .time-input {
             padding: 10px;
             border: 2px solid #e1e5e9;
@@ -86,11 +91,51 @@
             width: 100px;
             text-align: center;
             transition: border-color 0.3s ease;
+            padding-right: 25px;
         }
 
         .time-input:focus {
             outline: none;
             border-color: #667eea;
+        }
+
+        .fixed-colon {
+            position: absolute;
+            right: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.1em;
+            color: #666;
+            font-weight: bold;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .time-input-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .hours-input, .minutes-input {
+            padding: 10px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 1.1em;
+            width: 45px;
+            text-align: center;
+            transition: border-color 0.3s ease;
+        }
+
+        .hours-input:focus, .minutes-input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .time-separator {
+            font-size: 1.5em;
+            color: #666;
+            font-weight: bold;
         }
 
         .remove-btn {
@@ -238,17 +283,39 @@
                 <div class="time-inputs">
                     <div class="time-group">
                         <label>Time 1</label>
-                        <input type="text" class="time-input" id="time1_${entryCount}" placeholder="00:00" pattern="[0-9]{1,2}:[0-9]{2}">
+                        <div class="time-input-wrapper">
+                            <input type="text" class="hours-input" id="hours1_${entryCount}" placeholder="00" maxlength="2" onkeydown="handleKeyDown(this, event)">
+                            <span class="time-separator">:</span>
+                            <input type="text" class="minutes-input" id="minutes1_${entryCount}" placeholder="00" maxlength="2" onkeydown="handleKeyDown(this, event)">
+                        </div>
                     </div>
                     <div class="time-group">
                         <label>Time 2</label>
-                        <input type="text" class="time-input" id="time2_${entryCount}" placeholder="00:00" pattern="[0-9]{1,2}:[0-9]{2}">
+                        <div class="time-input-wrapper">
+                            <input type="text" class="hours-input" id="hours2_${entryCount}" placeholder="00" maxlength="2" onkeydown="handleKeyDown(this, event)">
+                            <span class="time-separator">:</span>
+                            <input type="text" class="minutes-input" id="minutes2_${entryCount}" placeholder="00" maxlength="2" onkeydown="handleKeyDown(this, event)">
+                        </div>
                     </div>
                 </div>
                 <button class="remove-btn" onclick="removeTimeEntry(this)">×</button>
             `;
             
             timeEntries.appendChild(entryDiv);
+        }
+
+        function handleKeyDown(input, event) {
+            // Allow backspace, delete, arrow keys, etc.
+            if ([8, 9, 37, 38, 39, 40, 46].includes(event.keyCode)) {
+                return true;
+            }
+            // Only allow numbers
+            if (event.keyCode >= 48 && event.keyCode <= 57) {
+                return true;
+            }
+            // Prevent other keys
+            event.preventDefault();
+            return false;
         }
 
         function removeTimeEntry(button) {
@@ -266,16 +333,6 @@
             entryCount = entries.length;
         }
 
-        function parseTime(timeString) {
-            if (!timeString || !timeString.includes(':')) return { hours: 0, minutes: 0 };
-            
-            const parts = timeString.split(':');
-            const hours = parseInt(parts[0]) || 0;
-            const minutes = parseInt(parts[1]) || 0;
-            
-            return { hours, minutes };
-        }
-
         function calculateTotal() {
             const entries = document.querySelectorAll('.time-entry');
             let totalHours = 0;
@@ -283,15 +340,14 @@
             let breakdown = [];
 
             entries.forEach((entry, index) => {
-                const time1Str = entry.querySelector(`#time1_${index + 1}`).value;
-                const time2Str = entry.querySelector(`#time2_${index + 1}`).value;
-
-                const time1 = parseTime(time1Str);
-                const time2 = parseTime(time2Str);
+                const hours1 = parseInt(entry.querySelector(`#hours1_${index + 1}`).value) || 0;
+                const minutes1 = parseInt(entry.querySelector(`#minutes1_${index + 1}`).value) || 0;
+                const hours2 = parseInt(entry.querySelector(`#hours2_${index + 1}`).value) || 0;
+                const minutes2 = parseInt(entry.querySelector(`#minutes2_${index + 1}`).value) || 0;
 
                 // Add the two times together
-                let entryHours = time1.hours + time2.hours;
-                let entryMinutes = time1.minutes + time2.minutes;
+                let entryHours = hours1 + hours2;
+                let entryMinutes = minutes1 + minutes2;
 
                 // Convert excess minutes to hours
                 if (entryMinutes >= 60) {
