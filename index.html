@@ -244,6 +244,119 @@
             font-size: 0.8em;
             font-weight: bold;
         }
+
+        /* Mobile Responsive Styles */
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+                align-items: flex-start;
+                padding-top: 20px;
+            }
+
+            .container {
+                padding: 20px;
+                border-radius: 15px;
+                margin: 0;
+            }
+
+            h1 {
+                font-size: 2em;
+                margin-bottom: 20px;
+            }
+
+            .time-entry {
+                flex-direction: column;
+                gap: 10px;
+                padding: 15px;
+            }
+
+            .time-inputs {
+                flex-direction: column;
+                gap: 15px;
+                width: 100%;
+            }
+
+            .time-group {
+                width: 100%;
+            }
+
+            .time-input-wrapper {
+                justify-content: center;
+                gap: 15px;
+            }
+
+            .hours-input, .minutes-input {
+                width: 60px;
+                height: 50px;
+                font-size: 1.2em;
+                padding: 12px;
+            }
+
+            .time-separator {
+                font-size: 2em;
+            }
+
+            .remove-btn {
+                width: 40px;
+                height: 40px;
+                font-size: 1.4em;
+                align-self: flex-end;
+            }
+
+            .add-btn {
+                padding: 15px 25px;
+                font-size: 1.2em;
+                width: 100%;
+                justify-content: center;
+            }
+
+            .calculate-btn {
+                padding: 18px 30px;
+                font-size: 1.3em;
+                margin-top: 25px;
+            }
+
+            .result {
+                margin-top: 25px;
+                padding: 25px 20px;
+            }
+
+            .result .total-hours {
+                font-size: 2.2em;
+            }
+
+            .entry-number {
+                width: 30px;
+                height: 30px;
+                font-size: 1em;
+                align-self: flex-start;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 15px;
+            }
+
+            h1 {
+                font-size: 1.8em;
+            }
+
+            .hours-input, .minutes-input {
+                width: 55px;
+                height: 45px;
+                font-size: 1.1em;
+            }
+
+            .time-separator {
+                font-size: 1.8em;
+            }
+
+            .add-btn, .calculate-btn {
+                font-size: 1.1em;
+                padding: 12px 20px;
+            }
+        }
     </style>
 </head>
 <body>
